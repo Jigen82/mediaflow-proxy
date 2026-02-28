@@ -1,0 +1,39 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # ogni ora
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync with upstream
+        run: |
+          set -e
+
+          # Imposta identità ufficiale del bot GitHub
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Aggiunge upstream se non esiste
+          git remote add upstream https://github.com/mhdzumair/mediaflow-proxy.git || true
+
+          # Prende gli ultimi aggiornamenti
+          git fetch upstream
+
+          # Merge normale (no force, no reset)
+          git merge upstream/main --no-edit || exit 0
+
+          # Push usando GITHUB_TOKEN (automatico)
+          git push origin main
