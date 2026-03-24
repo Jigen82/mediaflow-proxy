@@ -1,0 +1,47 @@
+name: Sync upstream
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync with upstream (code + safe tags)
+        run: |
+          set -e
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git remote add upstream https://github.com/mhdzumair/mediaflow-proxy.git || true
+          git fetch upstream --tags
+
+          git checkout main
+
+          # sync codice senza workflows
+          git checkout upstream/main -- . ':!.github/workflows'
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Sync upstream (exclude workflows)"
+            git push origin main
+          else
+            echo "No code changes"
+          fi
+
+          # 🔖 push tag sicuro
+          for tag in $(git tag); do
+            git push origin $tag || echo "Skipped tag $tag"
+          done
