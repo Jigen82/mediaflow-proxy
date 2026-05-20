@@ -117,10 +117,18 @@ class Settings(BaseSettings):
     # Generic HTTP forward endpoint (/proxy/forward) settings
     forward_allowed_hosts: list[str] = []  # Allowlist of hostnames. Empty = allow all.
     forward_denied_hosts: list[str] = []  # Extra denied hostnames (in addition to automatic private-IP guard).
-    forward_max_body_bytes: int = 10 * 1024 * 1024  # Deprecated: use forward_max_request_body_bytes / forward_max_response_body_bytes.
-    forward_max_request_body_bytes: int = 50 * 1024 * 1024  # Max incoming request body size (50 MB — allows NZB/torrent file uploads).
-    forward_max_response_body_bytes: int = 10 * 1024 * 1024  # Max upstream response body size (10 MB — API JSON responses).
-    public_ip: str | None = None  # MediaFlow's own public IP. Used to substitute {mediaflow_ip} in forwarded requests. Auto-detected if not set.
+    forward_max_body_bytes: int = (
+        10 * 1024 * 1024
+    )  # Deprecated: use forward_max_request_body_bytes / forward_max_response_body_bytes.
+    forward_max_request_body_bytes: int = (
+        50 * 1024 * 1024
+    )  # Max incoming request body size (50 MB — allows NZB/torrent file uploads).
+    forward_max_response_body_bytes: int = (
+        10 * 1024 * 1024
+    )  # Max upstream response body size (10 MB — API JSON responses).
+    public_ip: str | None = (
+        None  # MediaFlow's own public IP. Used to substitute {mediaflow_ip} in forwarded requests. Auto-detected if not set.
+    )
 
     # EPG proxy settings
     epg_cache_ttl: int = 3600  # TTL (seconds) for cached EPG/XMLTV data. Default 1 hour.
